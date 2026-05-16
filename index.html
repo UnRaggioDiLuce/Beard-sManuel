@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOSTRUNISMI v2 - Gestore Barbe AI</title>
+    <title>Manuel's Beard</title>
     <style>
         :root { --primary: #bc9c1c; --bg: #121212; --card-bg: #1e1e1e; --text: #e0e0e0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
         
         header { background-color: var(--card-bg); width: 100%; padding: 20px 0; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); position: fixed; top: 0; z-index: 100; }
+        /* STILE TITOLO H1 AGGIORNATO */
         header h1 { margin: 0; font-size: 2.5em; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
 
         /* Pagina di Scelta (Lunga) */
@@ -61,7 +62,7 @@
 <body>
 
     <header>
-        <h1>KOSTRUNISMI</h1>
+        <h1>Manuel's Beard</h1>
     </header>
 
     <div id="selection-page">
@@ -253,31 +254,25 @@
             window.scrollTo(0, 0);
 
             // QUI L'APP REALE INVIEREBBE L'IMMAGINE ORIGINALE E I DATI ALL'API AI
-            // Istruzioni inviate: "Usa volto invariato Davide G. (image_0.png), applica barba stile ${styleName} colore ${colorValue}, nuovo sfondo e vestiti random."
+            // Istruzioni inviate: "Usa volto invariato Manuel (image_0.JPG), applica barba stile ${styleName} colore ${colorValue}, nuovo sfondo e vestiti random."
 
             console.log("INVIO DATI AI:");
-            console.log("- Immagine Base: image_0.png (VOLTO FISSO)");
+            console.log("- Immagine Base: image_0.JPG (VOLTO FISSO)"); // AGGIORNATO CON NOME FILE CORRETTO
             console.log("- Nuovo Stile: " + styleName);
             console.log("- Nuovo Colore: " + colorValue);
 
             // Simuliamo il tempo di generazione (2.5 secondi)
             setTimeout(() => {
-                // Generiamo un URL immagine AI "simulato" basato sullo stile e colore.
-                // In un'app reale, questo URL verrebbe restituito dall'API AI.
-                // Usiamo placeholder realistici per mostrare il risultato visivo.
                 
-                // Creiamo un prompt testuale completo che l'AI userebbe
-                const aiPrompt = `A photo of Davide G. (using face from image_0.png) but with a perfectly rendered ${styleName} beard and mustache in ${colorValue} color. He is wearing a random new casual outfit (e.g., a patterned shirt, a hoodie) and is standing in a new random realistic location (e.g., a modern coffee shop, a vineyard, an old barber shop). Focus on maintained facial identity and realistic hair texture.`;
+                // CORREZIONE ERRORE IMMAGINE:
+                // Sostituiamo il link Imgur rotto/scaduto con un link RELATIVO alla tua foto nella stessa cartella.
+                // Questo rende la simulazione robusta: mostrerà la tua faccia e ti permetterà di leggere la descrizione della barba.
+                // (In un'app reale, questo sarebbe l'URL restituito dall'API AI con la barba applicata).
+                
+                const processedImageUrl = "image_0.JPG"; // AGGIORNATO CON NOME FILE CORRETTO (casing .JPG)
 
-                // URL Placeholder realistico (un'app vera non userebbe lorempixel/via.placeholder per questo)
-                // Usiamo un'immagine statica che rappresenta il risultato di un'AI che ha processato quella faccia.
-                // Per il test, mostrerò una versione processata della foto base con barba diversa.
-                //const processedImageUrl = `https://via.placeholder.com/600x600/1e1e1e/bc9c1c?text=${encodeURIComponent(styleName)}+${encodeURIComponent(colorValue)}`;
-                
-                // USIAMO L'IMMAGINE DEL RISULTATO DI image_1.png CHE RAPPRESENTA LA TUA RICHIESTA
-                // Per un test perfetto, mostro l'immagine_1.png che simula esattamente la tua faccia con una barba generata.
-                // In una vera app, l'url sarebbe generato dinamicamente.
-                const processedImageUrl = 'https://i.imgur.com/8v4O8tM.png'; // Ho caricato image_1.png su imgur per il test
+                // Creiamo un prompt testuale completo che l'AI userebbe
+                const aiPrompt = `A photo of Manuel (using face from image_0.JPG) but with a perfectly rendered ${styleName} beard and mustache in ${colorValue} color. He is wearing a random new casual outfit...`;
 
                 // Aggiorna la pagina dei risultati
                 document.getElementById('result-photo').src = processedImageUrl;
