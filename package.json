@@ -1,0 +1,6 @@
+  "name": "beard-s-manuel",
+  "version": "1.0.0",
+  "dependencies": {
+    "@heyputer/puter.js": "^2.3.2"
+  }
+}
