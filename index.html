@@ -20,7 +20,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
-    /* HEADER */
     header {
       background: var(--card);
       border-bottom: 1px solid var(--border);
@@ -32,10 +31,8 @@
     header h1 { font-size: 1.55rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; }
     header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
 
-    /* PAGE */
     .page { max-width: 1080px; margin: 0 auto; padding: 28px 18px 70px; }
 
-    /* TOP: two photos side by side */
     .photos-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -69,14 +66,17 @@
       align-items: center;
       justify-content: center;
     }
-    .photo-inner img {
+    .photo-inner img.main-photo {
       width: 100%; height: 100%;
       object-fit: cover;
       display: block;
     }
-    #result-img { display: none; position: absolute; inset: 0; }
-
-    /* placeholder text in result */
+    #result-img {
+      display: none;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
     #result-placeholder {
       text-align: center;
       color: var(--muted);
@@ -84,8 +84,6 @@
       line-height: 1.7;
       padding: 20px;
     }
-
-    /* skeleton */
     .skeleton {
       position: absolute; inset: 0;
       background: linear-gradient(90deg,#1a1a1a 25%,#282828 50%,#1a1a1a 75%);
@@ -94,7 +92,6 @@
       display: none;
     }
     @keyframes shi{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
     .loader-text {
       position: absolute;
       bottom: 12px; left: 0; right: 0;
@@ -104,7 +101,6 @@
       display: none;
     }
 
-    /* OPTIONS CARD */
     .options-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -123,7 +119,6 @@
       margin-bottom: 10px;
     }
 
-    /* chips */
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip {
       background: var(--card2);
@@ -146,7 +141,6 @@
     .chip small { display: block; font-size: 0.68rem; color: var(--muted); margin-top: 2px; font-weight: 400; }
     .chip.on small { color: rgba(201,168,76,0.65); }
 
-    /* color chips */
     .color-chip {
       display: flex; align-items: center; gap: 8px;
       background: var(--card2);
@@ -162,7 +156,6 @@
     .color-chip.on { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold2); font-weight: 600; }
     .cdot { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
 
-    /* summary */
     .summary {
       background: var(--card2);
       border: 1px solid var(--border);
@@ -175,7 +168,6 @@
     }
     .summary b { color: var(--gold2); font-weight: 600; }
 
-    /* generate button */
     #gen-btn {
       display: block; width: 100%;
       padding: 16px;
@@ -189,7 +181,6 @@
     #gen-btn:hover { background: var(--gold2); }
     #gen-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* regen row */
     .regen-row { display: flex; gap: 10px; margin-top: 14px; }
     .btn-sec {
       flex: 1; padding: 13px;
@@ -201,14 +192,9 @@
     }
     .btn-sec:hover { background: #2a2a2a; }
 
-    /* powered */
-    .powered {
-      text-align: center; margin-top: 28px;
-      font-size: 0.7rem; color: #444;
-    }
+    .powered { text-align: center; margin-top: 28px; font-size: 0.7rem; color: #444; }
     .powered span { color: var(--gold); }
 
-    /* error */
     #err-box {
       display: none;
       margin-top: 12px;
@@ -226,14 +212,15 @@
 
   <div class="page">
 
-    <!-- FOTO: originale | generata -->
     <div class="photos-row">
+      <!-- FOTO ORIGINALE — usa il file image_0.JPG nella root del repo -->
       <div class="photo-panel">
         <div class="photo-label">📷 Foto Originale</div>
         <div class="photo-inner">
-          <img src="images/original-face.jpg" alt="Foto originale" crossorigin="anonymous" />
+          <img class="main-photo" src="image_0.JPG" alt="Foto originale" />
         </div>
       </div>
+      <!-- FOTO GENERATA -->
       <div class="photo-panel">
         <div class="photo-label">✨ Immagine Generata</div>
         <div class="photo-inner" id="result-wrap">
@@ -242,7 +229,7 @@
           <div id="result-placeholder">
             Seleziona le opzioni e clicca<br /><strong style="color:var(--gold)">Genera Immagine</strong>
           </div>
-          <div class="loader-text" id="loader-text">Generazione in corso...</div>
+          <div class="loader-text" id="loader-text"></div>
         </div>
       </div>
     </div>
@@ -250,23 +237,22 @@
     <!-- OPZIONI -->
     <div class="options-card">
 
-      <!-- Stile Barba -->
       <div class="opt-group">
         <div class="opt-title">Stile Barba</div>
-        <div class="chips" id="chips-style">
-          <div class="chip on" data-group="style" data-val="full beard, thick and well-groomed" data-label="Barba Piena">
+        <div class="chips">
+          <div class="chip on" data-group="style" data-val="full beard thick and well-groomed" data-label="Barba Piena">
             Barba Piena <small>Barba folta e ben curata</small>
           </div>
-          <div class="chip" data-group="style" data-val="goatee beard, only chin and mustache, shaved cheeks" data-label="Pizzetto">
+          <div class="chip" data-group="style" data-val="goatee beard only chin and mustache shaved cheeks" data-label="Pizzetto">
             Pizzetto <small>Solo mento e baffi</small>
           </div>
-          <div class="chip" data-group="style" data-val="short stubble beard 3-5 days" data-label="Barba Corta">
+          <div class="chip" data-group="style" data-val="very short stubble beard 3 days" data-label="Barba Corta">
             Barba Corta <small>Barba di 3-5 giorni</small>
           </div>
-          <div class="chip" data-group="style" data-val="completely clean shaved face, no beard" data-label="Rasato">
+          <div class="chip" data-group="style" data-val="completely clean shaved face no beard" data-label="Rasato">
             Rasato <small>Viso completamente rasato</small>
           </div>
-          <div class="chip" data-group="style" data-val="Van Dyke beard with pointed goatee and separated curled mustache" data-label="Van Dyke">
+          <div class="chip" data-group="style" data-val="Van Dyke beard pointed goatee and separated curled mustache" data-label="Van Dyke">
             Van Dyke <small>Pizzetto con baffi separati</small>
           </div>
           <div class="chip" data-group="style" data-val="long sideburns going down to the chin" data-label="Basette Lunghe">
@@ -275,67 +261,64 @@
         </div>
       </div>
 
-      <!-- Colore Barba -->
       <div class="opt-group">
         <div class="opt-title">Colore Barba</div>
-        <div class="chips" id="chips-color">
-          <div class="color-chip on" data-group="color" data-val="natural beard color" data-label="Naturale">
+        <div class="chips">
+          <div class="color-chip on" data-group="color" data-val="natural color" data-label="Naturale">
             <div class="cdot" style="background:linear-gradient(135deg,#4a3520,#888)"></div>Naturale
           </div>
-          <div class="color-chip" data-group="color" data-val="jet black beard" data-label="Nero">
+          <div class="color-chip" data-group="color" data-val="jet black" data-label="Nero">
             <div class="cdot" style="background:#111"></div>Nero
           </div>
-          <div class="color-chip" data-group="color" data-val="dark brown beard" data-label="Castano">
+          <div class="color-chip" data-group="color" data-val="dark brown" data-label="Castano">
             <div class="cdot" style="background:#5c3317"></div>Castano
           </div>
-          <div class="color-chip" data-group="color" data-val="blonde beard" data-label="Biondo">
+          <div class="color-chip" data-group="color" data-val="blonde" data-label="Biondo">
             <div class="cdot" style="background:#d4a843"></div>Biondo
           </div>
-          <div class="color-chip" data-group="color" data-val="red auburn beard" data-label="Rosso">
+          <div class="color-chip" data-group="color" data-val="red auburn" data-label="Rosso">
             <div class="cdot" style="background:#8b2e10"></div>Rosso
           </div>
-          <div class="color-chip" data-group="color" data-val="white beard" data-label="Bianco">
+          <div class="color-chip" data-group="color" data-val="white" data-label="Bianco">
             <div class="cdot" style="background:#ddd;border-color:#888"></div>Bianco
           </div>
-          <div class="color-chip" data-group="color" data-val="salt and pepper gray beard" data-label="Grigio">
+          <div class="color-chip" data-group="color" data-val="salt and pepper gray" data-label="Grigio">
             <div class="cdot" style="background:#777"></div>Grigio
           </div>
         </div>
       </div>
 
-      <!-- Sfondo -->
       <div class="opt-group">
         <div class="opt-title">Sfondo</div>
-        <div class="chips" id="chips-bg">
-          <div class="chip on" data-group="bg" data-val="professional photography studio background with soft grey backdrop" data-label="Studio Fotografico">
+        <div class="chips">
+          <div class="chip on" data-group="bg" data-val="professional photography studio soft grey backdrop" data-label="Studio Fotografico">
             Studio Fotografico
           </div>
-          <div class="chip" data-group="bg" data-val="modern office background with blurred desks and city windows" data-label="Ufficio Moderno">
+          <div class="chip" data-group="bg" data-val="modern office background blurred desks and city windows" data-label="Ufficio Moderno">
             Ufficio Moderno
           </div>
-          <div class="chip" data-group="bg" data-val="outdoor nature background with blurred trees and daylight" data-label="All'Aperto">
+          <div class="chip" data-group="bg" data-val="outdoor nature background blurred trees and daylight" data-label="All'Aperto">
             All'Aperto
           </div>
-          <div class="chip" data-group="bg" data-val="blurred city street urban background at golden hour" data-label="Città">
+          <div class="chip" data-group="bg" data-val="blurred city street urban background golden hour" data-label="Città">
             Città
           </div>
-          <div class="chip" data-group="bg" data-val="beach background with blurred ocean and warm light" data-label="Spiaggia">
+          <div class="chip" data-group="bg" data-val="beach background blurred ocean warm light" data-label="Spiaggia">
             Spiaggia
           </div>
         </div>
       </div>
 
-      <!-- Abbigliamento -->
       <div class="opt-group">
         <div class="opt-title">Abbigliamento</div>
-        <div class="chips" id="chips-clothes">
-          <div class="chip" data-group="clothes" data-val="wearing a dark grey formal suit and tie, elegant attire" data-label="Abito Elegante">
+        <div class="chips">
+          <div class="chip" data-group="clothes" data-val="wearing dark grey formal suit and tie" data-label="Abito Elegante">
             Abito Elegante <small>Completo grigio scuro</small>
           </div>
-          <div class="chip on" data-group="clothes" data-val="wearing a casual t-shirt and jeans" data-label="Casual">
+          <div class="chip on" data-group="clothes" data-val="wearing casual t-shirt and jeans" data-label="Casual">
             Casual <small>Maglietta e jeans</small>
           </div>
-          <div class="chip" data-group="clothes" data-val="wearing a business casual shirt and blazer jacket" data-label="Business Casual">
+          <div class="chip" data-group="clothes" data-val="wearing business casual shirt and blazer jacket" data-label="Business Casual">
             Business Casual <small>Camicia e giacca</small>
           </div>
           <div class="chip" data-group="clothes" data-val="wearing a plain simple t-shirt" data-label="T-Shirt">
@@ -349,8 +332,7 @@
 
     </div>
 
-    <!-- RIEPILOGO SELEZIONE -->
-    <div class="summary" id="summary-box">
+    <div class="summary">
       <b>Selezione Attuale</b><br />
       Stile: <b id="s-style">Barba Piena</b> &nbsp;·&nbsp;
       Colore: <b id="s-color">Naturale</b> &nbsp;·&nbsp;
@@ -359,33 +341,35 @@
     </div>
 
     <button id="gen-btn" onclick="genera()">✨ Genera Immagine</button>
-    <div id="err-box">⚠️ Errore nella generazione. Clicca "Rigenera" per riprovare.</div>
+    <div id="err-box">⚠️ Errore nella generazione. Riprova tra qualche secondo.</div>
 
     <div class="regen-row" id="regen-row" style="display:none">
       <button class="btn-sec" onclick="rigenera()">🔄 Rigenera</button>
-      <button class="btn-sec" onclick="location.reload()">← Ricomincia</button>
+      <button class="btn-sec" onclick="resetUI()">← Nuova selezione</button>
     </div>
 
-    <div class="powered">Immagine generata da <span>Pollinations.ai</span> · Gratis · Nessuna API key richiesta</div>
-
-  </div><!-- /page -->
+    <div class="powered">Immagine generata da <span>Pollinations.ai</span> · Gratis · Nessuna API key</div>
+  </div>
 
   <script>
-    // ── stato selezionato ───────────────────────────────────────────
+    // ── selezione corrente ─────────────────────────────────────────
     const sel = {
-      style:   { val: 'full beard, thick and well-groomed',                           label: 'Barba Piena' },
-      color:   { val: 'natural beard color',                                           label: 'Naturale' },
-      bg:      { val: 'professional photography studio background with soft grey backdrop', label: 'Studio Fotografico' },
-      clothes: { val: 'wearing a casual t-shirt and jeans',                            label: 'Casual' }
+      style:   { val: 'full beard thick and well-groomed',                         label: 'Barba Piena' },
+      color:   { val: 'natural color',                                              label: 'Naturale' },
+      bg:      { val: 'professional photography studio soft grey backdrop',         label: 'Studio Fotografico' },
+      clothes: { val: 'wearing casual t-shirt and jeans',                           label: 'Casual' }
     };
+
+    // URL della foto originale già pubblica su Vercel — usata come base img2img
+    const ORIGINAL_URL = 'https://beard-s-manuel.vercel.app/image_0.JPG';
+
     let currentSeed = 0;
     let loaderTimer = null;
 
-    // ── chip click ─────────────────────────────────────────────────
+    // ── click chip ─────────────────────────────────────────────────
     document.querySelectorAll('[data-group]').forEach(chip => {
       chip.addEventListener('click', function () {
         const g = this.dataset.group;
-        // deselect same group
         document.querySelectorAll(`[data-group="${g}"]`).forEach(c => c.classList.remove('on'));
         this.classList.add('on');
         sel[g] = { val: this.dataset.val, label: this.dataset.label };
@@ -400,56 +384,45 @@
       document.getElementById('s-clothes').textContent = sel.clothes.label;
     }
 
-    // ── build prompt ───────────────────────────────────────────────
+    // ── costruisce il prompt ───────────────────────────────────────
     function buildPrompt() {
-      // Descriviamo ESATTAMENTE cosa vogliamo mantenere e cosa cambiare,
-      // passando l'immagine originale come base (img2img via Pollinations).
       return [
-        'photorealistic portrait photo of the same man from the reference image,',
-        'keep the face identical same person same features,',
-        sel.style.val + ',',
-        sel.color.val + ',',
+        'photorealistic portrait photo,',
+        'same man same face identical features from the reference image,',
+        sel.style.val + ' beard,',
+        sel.color.val + ' beard color,',
         sel.clothes.val + ',',
-        sel.bg.val + ',',
-        'high quality sharp focus professional portrait photography, 8k'
+        sel.bg.val + ' background,',
+        'professional portrait photography sharp focus high quality 8k'
       ].join(' ');
     }
 
     // ── URL Pollinations img2img ───────────────────────────────────
-    // Passiamo la foto originale come "image" base — Pollinations usa FLUX img2img
-    // che mantiene la struttura del volto mentre applica le modifiche richieste.
+    // ?image= passa la foto originale come base → FLUX preserva il volto
     function buildUrl(seed) {
-      const prompt     = encodeURIComponent(buildPrompt());
-      const sourceImg  = encodeURIComponent('https://v0-beard-style-generator.vercel.app/images/original-face.jpg');
+      const prompt = encodeURIComponent(buildPrompt());
+      const source = encodeURIComponent(ORIGINAL_URL);
       return `https://image.pollinations.ai/prompt/${prompt}`
-           + `?image=${sourceImg}`
+           + `?image=${source}`
            + `&model=flux`
            + `&width=512&height=680`
            + `&nologo=true`
-           + `&enhance=true`
            + `&seed=${seed}`;
     }
 
-    // ── genera ─────────────────────────────────────────────────────
-    function genera() {
-      currentSeed = Math.floor(Math.random() * 9_999_999);
-      avvia();
-    }
-    function rigenera() {
-      currentSeed = Math.floor(Math.random() * 9_999_999);
-      avvia();
-    }
+    // ── genera / rigenera ──────────────────────────────────────────
+    function genera()   { currentSeed = (Math.random() * 9_999_999) | 0; avvia(); }
+    function rigenera() { currentSeed = (Math.random() * 9_999_999) | 0; avvia(); }
 
     function avvia() {
-      const skeleton   = document.getElementById('skeleton');
-      const resultImg  = document.getElementById('result-img');
+      const skeleton    = document.getElementById('skeleton');
+      const resultImg   = document.getElementById('result-img');
       const placeholder = document.getElementById('result-placeholder');
-      const loaderTxt  = document.getElementById('loader-text');
-      const errBox     = document.getElementById('err-box');
-      const genBtn     = document.getElementById('gen-btn');
-      const regenRow   = document.getElementById('regen-row');
+      const loaderTxt   = document.getElementById('loader-text');
+      const errBox      = document.getElementById('err-box');
+      const genBtn      = document.getElementById('gen-btn');
+      const regenRow    = document.getElementById('regen-row');
 
-      // reset UI
       skeleton.style.display    = 'block';
       resultImg.style.display   = 'none';
       placeholder.style.display = 'none';
@@ -460,19 +433,11 @@
       regenRow.style.display    = 'none';
       if (loaderTimer) clearInterval(loaderTimer);
 
-      // rotating messages
-      const msgs = [
-        'Analisi del volto...',
-        'Applicazione barba...',
-        'Rendering sfondo...',
-        'Aggiunta vestiti...',
-        'Quasi pronto...'
-      ];
+      const msgs = ['Analisi del volto...','Applicazione barba...','Rendering sfondo...','Aggiunta vestiti...','Quasi pronto...'];
       let mi = 0;
       loaderTimer = setInterval(() => {
-        mi = (mi + 1) % msgs.length;
-        loaderTxt.textContent = msgs[mi];
-      }, 2400);
+        loaderTxt.textContent = msgs[++mi % msgs.length];
+      }, 2500);
 
       const url = buildUrl(currentSeed);
       const img = new Image();
@@ -497,6 +462,13 @@
       };
 
       img.src = url;
+    }
+
+    function resetUI() {
+      document.getElementById('result-img').style.display   = 'none';
+      document.getElementById('result-placeholder').style.display = 'block';
+      document.getElementById('regen-row').style.display    = 'none';
+      document.getElementById('err-box').style.display      = 'none';
     }
   </script>
 </body>
