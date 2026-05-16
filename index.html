@@ -1,396 +1,503 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manuel's Beard</title>
-    <style>
-        :root { --primary: #bc9c1c; --bg: #121212; --card-bg: #1e1e1e; --text: #e0e0e0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-        
-        header { background-color: var(--card-bg); width: 100%; padding: 20px 0; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); position: fixed; top: 0; z-index: 100; }
-        header h1 { margin: 0; font-size: 2.5em; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Genera nuove immagini con diversi stili di barba, colori, sfondi e vestiti" />
+  <title>Beard Style Generator - AI</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --card2: #202020;
+      --border: #2d2d2d;
+      --gold: #c9a84c;
+      --gold2: #e8c97a;
+      --text: #efefef;
+      --muted: #777;
+      --r: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
 
-        #selection-page { margin-top: 100px; width: 90%; max-width: 800px; padding-bottom: 50px; display: block; }
-        .category-title { font-size: 2.2em; color: var(--primary); margin-top: 40px; margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 5px; text-transform: uppercase;}
-        
-        .beard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-        .beard-item { background: var(--card-bg); padding: 15px; border-radius: 8px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; border: 2px solid transparent; }
-        .beard-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(188, 156, 28, 0.2); }
-        .beard-item.selected { border-color: var(--primary); background-color: #2a2a2a; }
-        .beard-item h3 { margin: 0 0 5px 0; font-size: 1.2em; }
-        
-        .beard-item input[type="radio"] { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .checkmark { position: absolute; top: 15px; right: 15px; height: 20px; width: 20px; background-color: #333; border-radius: 50%; border: 2px solid #555; }
-        .beard-item:hover .checkmark { border-color: var(--primary); }
-        .beard-item input:checked ~ .checkmark { background-color: var(--primary); border-color: var(--primary); }
-        .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); }
-        .beard-item input:checked ~ .checkmark:after { display: block; }
+    /* HEADER */
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      text-align: center;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    header h1 { font-size: 1.55rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; }
+    header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
 
-        #color-section { margin-top: 50px; background: var(--card-bg); padding: 25px; border-radius: 12px; text-align: center;}
-        #color-section h2 { color: var(--primary); margin-top: 0; font-size: 2em;}
-        .color-group { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
-        .color-item { background: #333; padding: 10px 20px; border-radius: 20px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; font-weight: bold;}
-        .color-item:hover { background: #444; border-color: var(--primary); }
-        .color-item.selected { background-color: var(--primary); color: #121212; border-color: var(--primary); }
-        .color-item input { display: none; }
+    /* PAGE */
+    .page { max-width: 1080px; margin: 0 auto; padding: 28px 18px 70px; }
 
-        #generate-btn { display: block; width: 100%; max-width: 400px; margin: 40px auto; padding: 15px; background-color: var(--primary); color: #121212; border: none; border-radius: 8px; font-size: 1.3em; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: background 0.2s; }
-        #generate-btn:hover { background-color: #d4b02d; }
-        #generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* TOP: two photos side by side */
+    .photos-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    @media(max-width:620px){ .photos-row { grid-template-columns: 1fr; } }
 
-        /* Pagina Risultato */
-        #result-page { margin-top: 100px; width: 90%; max-width: 720px; text-align: center; display: none; padding-bottom: 50px;}
+    .photo-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    .photo-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+      padding: 12px 14px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .photo-inner {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--card2);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .photo-inner img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #result-img { display: none; position: absolute; inset: 0; }
 
-        .photos-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        @media (max-width: 550px) { .photos-row { grid-template-columns: 1fr; } }
+    /* placeholder text in result */
+    #result-placeholder {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.7;
+      padding: 20px;
+    }
 
-        .photo-box { background: var(--card-bg); padding: 10px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .photo-label { font-size: 0.75em; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); margin-bottom: 8px; font-weight: bold; }
-        .photo-box img { width: 100%; border-radius: 8px; display: block; aspect-ratio: 3/4; object-fit: cover; background: #111; }
+    /* skeleton */
+    .skeleton {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg,#1a1a1a 25%,#282828 50%,#1a1a1a 75%);
+      background-size: 200% 100%;
+      animation: shi 1.4s infinite;
+      display: none;
+    }
+    @keyframes shi{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-        /* Skeleton loader */
-        .img-skeleton {
-            width: 100%; aspect-ratio: 3/4; border-radius: 8px;
-            background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.4s infinite;
-            display: none;
-        }
-        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .loader-text {
+      position: absolute;
+      bottom: 12px; left: 0; right: 0;
+      text-align: center;
+      font-size: 0.74rem;
+      color: var(--gold);
+      display: none;
+    }
 
-        #loader-text { display: none; text-align: center; margin-top: 10px; font-size: 0.85em; color: #888; min-height: 20px; }
+    /* OPTIONS CARD */
+    .options-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 22px 20px 24px;
+      margin-bottom: 18px;
+    }
+    .opt-group { margin-bottom: 20px; }
+    .opt-group:last-child { margin-bottom: 0; }
+    .opt-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
 
-        #result-info { margin-top: 10px; text-align: left; display: none; }
-        #result-style-title { font-size: 2.4em; color: var(--primary); margin: 0; text-transform: uppercase; letter-spacing: 1px;}
-        #result-style-desc { font-size: 1.1em; line-height: 1.6; margin-top: 10px; color: #ccc; }
+    /* chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      background: var(--card2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--text);
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--gold); color: var(--gold); }
+    .chip.on {
+      background: rgba(201,168,76,0.1);
+      border-color: var(--gold);
+      color: var(--gold2);
+      font-weight: 600;
+    }
+    .chip small { display: block; font-size: 0.68rem; color: var(--muted); margin-top: 2px; font-weight: 400; }
+    .chip.on small { color: rgba(201,168,76,0.65); }
 
-        .powered-badge { display: inline-block; margin-top: 15px; font-size: 0.72em; color: #555; border: 1px solid #333; padding: 4px 10px; border-radius: 20px; }
-        .powered-badge span { color: var(--primary); }
+    /* color chips */
+    .color-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--card2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 13px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .color-chip:hover { border-color: var(--gold); }
+    .color-chip.on { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold2); font-weight: 600; }
+    .cdot { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
 
-        .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
-        .btn-secondary { padding: 12px 25px; background-color: #333; color: white; border: none; border-radius: 8px; font-size: 1em; cursor: pointer; transition: 0.2s; }
-        .btn-secondary:hover { background-color: #444; }
-        .btn-primary { padding: 12px 25px; background-color: var(--primary); color: #121212; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-primary:hover { background-color: #d4b02d; }
+    /* summary */
+    .summary {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 13px 18px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.9;
+      margin-bottom: 16px;
+    }
+    .summary b { color: var(--gold2); font-weight: 600; }
 
-        #error-msg { display: none; background: #2d1a1a; border: 1px solid #7a3a3a; color: #e08080; padding: 12px 18px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; }
-    </style>
+    /* generate button */
+    #gen-btn {
+      display: block; width: 100%;
+      padding: 16px;
+      background: var(--gold);
+      color: #0f0f0f;
+      border: none; border-radius: var(--r);
+      font-size: 1.05rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    #gen-btn:hover { background: var(--gold2); }
+    #gen-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* regen row */
+    .regen-row { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-sec {
+      flex: 1; padding: 13px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--text); font-size: 0.9rem; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-sec:hover { background: #2a2a2a; }
+
+    /* powered */
+    .powered {
+      text-align: center; margin-top: 28px;
+      font-size: 0.7rem; color: #444;
+    }
+    .powered span { color: var(--gold); }
+
+    /* error */
+    #err-box {
+      display: none;
+      margin-top: 12px;
+      background: #2a1515; border: 1px solid #6a3030;
+      color: #e07070; border-radius: var(--r);
+      padding: 12px 16px; font-size: 0.82rem;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>Beard Style Generator</h1>
+    <p>Scegli lo stile di barba, colore, sfondo e vestiti per generare una nuova immagine</p>
+  </header>
 
-    <header>
-        <h1>Manuel's Beard</h1>
-    </header>
+  <div class="page">
 
-    <!-- PAGINA SELEZIONE -->
-    <div id="selection-page">
-        <form id="beard-form">
-            
-            <div class="category-title">Corte e Ordinate</div>
-            <div class="beard-grid">
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="stubble_leggera"
-                        data-name="Stubble Leggera"
-                        data-desc="La classica 'barba di tre giorni'. Molto corta (1-3mm), uniforme, dona un aspetto trasandato ma curato."
-                        data-prompt="man with very short 3-day stubble beard 2mm, clean and well-groomed, uniform short stubble">
-                    <span class="checkmark"></span><h3>Stubble Leggera</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="corporate_beard"
-                        data-name="Corporate Beard"
-                        data-desc="Barba completa e ben curata, mantenuta a una lunghezza corta (5-10mm). Professionale e ordinata."
-                        data-prompt="man with corporate beard, full short beard 7mm neatly trimmed, professional well-groomed beard">
-                    <span class="checkmark"></span><h3>Corporate Beard</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="pizzetto_semplice"
-                        data-name="Pizzetto Semplice"
-                        data-desc="Baffi e peli solo sul mento, uniti intorno alla bocca. Le guance sono rasate."
-                        data-prompt="man with a simple goatee, mustache and chin beard only, clean shaved cheeks">
-                    <span class="checkmark"></span><h3>Pizzetto Semplice</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="beard_stache"
-                        data-name="Beardstache"
-                        data-desc="Un contrasto deciso: baffi folti e lunghi abbinati a una barba stubble molto corta."
-                        data-prompt="man with beardstache style, thick prominent mustache with very short stubble beard, strong contrast">
-                    <span class="checkmark"></span><h3>Beardstache</h3>
-                </label>
-            </div>
-
-            <div class="category-title">Medie e Scolpite</div>
-            <div class="beard-grid">
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="balbo"
-                        data-name="Barba alla Balbo"
-                        data-desc="Un'icona italiana. Pizzetto a forma di ancora sul mento e baffi scolpiti, senza basette."
-                        data-prompt="man with Balbo beard, anchor shaped chin beard and sculpted floating mustache, no sideburns, Italian classic style">
-                    <span class="checkmark"></span><h3>alla Balbo</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="van_dyke"
-                        data-name="Van Dyke"
-                        data-desc="Stile artistico che combina baffi a manubrio arricciati e un pizzetto a punta, disconnected."
-                        data-prompt="man with Van Dyke beard, pointed chin beard and curled handlebar mustache disconnected">
-                    <span class="checkmark"></span><h3>Van Dyke</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="ducktail"
-                        data-name="Ducktail (Coda d'Anatra)"
-                        data-desc="Barba completa scolpita a punta sul mento, come la coda di un'anatra. Richiede cura."
-                        data-prompt="man with ducktail beard, full beard shaped into a pointed tip at the chin, well groomed">
-                    <span class="checkmark"></span><h3>Ducktail</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="hollywoodian"
-                        data-name="Hollywoodian"
-                        data-desc="Barba completa con guance rasate e linea del collo molto bassa. Uno stile vintage."
-                        data-prompt="man with Hollywoodian beard, full beard with shaved cheeks, chin and jawline connected, vintage style">
-                    <span class="checkmark"></span><h3>Hollywoodian</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="ancora"
-                        data-name="Barba ad Ancora"
-                        data-desc="Forma molto definita che traccia la mascella con un pizzetto a punta e baffi a matita."
-                        data-prompt="man with anchor beard, defined pointed chin beard tracing jaw with pencil thin mustache, sharp edges">
-                    <span class="checkmark"></span><h3>ad Ancora</h3>
-                </label>
-            </div>
-
-            <div class="category-title">Lunghe e Folte</div>
-            <div class="beard-grid">
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="garibaldi"
-                        data-name="alla Garibaldi"
-                        data-desc="Barba lunga (fino a 20cm), larga e arrotondata alla base. Maschile, richiede pazienza."
-                        data-prompt="man with Garibaldi beard, long wide rounded full beard, masculine natural look">
-                    <span class="checkmark"></span><h3>alla Garibaldi</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="verdi"
-                        data-name="alla Verdi"
-                        data-desc="Barba completa folta arrotondata sul mento, abbinata a baffi a manubrio prominenti."
-                        data-prompt="man with Verdi beard, thick full rounded beard with prominent handlebar mustache, opera style">
-                    <span class="checkmark"></span><h3>alla Verdi</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="boscaiolo"
-                        data-name="Stile Boscaiolo (Lumberjack)"
-                        data-desc="Barba completa, lunga e molto folta, dall'aspetto naturale e robusto. Simbolo hipster."
-                        data-prompt="man with lumberjack beard, very thick full long natural beard, rugged masculine hipster style">
-                    <span class="checkmark"></span><h3>Boscaiolo</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="bandholz"
-                        data-name="Bandholz Beard"
-                        data-desc="Barba completa e lunghissima, lasciata crescere liberamente per mesi o anni. Totale."
-                        data-prompt="man with Bandholz beard, extremely long full free-growing beard, ultimate yeard beard">
-                    <span class="checkmark"></span><h3>Bandholz</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="vichinga"
-                        data-name="Barba Vichinga"
-                        data-desc="Barba lunghissima e incolta, spesso intrecciata o divisa, dall'aspetto selvaggio."
-                        data-prompt="man with viking braided beard, very long wild beard with braids, norse warrior">
-                    <span class="checkmark"></span><h3>Vichinga</h3>
-                </label>
-            </div>
-
-            <div class="category-title">Solo Baffi</div>
-            <div class="beard-grid">
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="chevron"
-                        data-name="Baffi Chevron"
-                        data-desc="Baffi folti e larghi che coprono l'intero labbro superiore, icona degli anni '80."
-                        data-prompt="man with chevron mustache, thick wide mustache covering upper lip, 1980s style, no beard">
-                    <span class="checkmark"></span><h3>Chevron</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="manubrio"
-                        data-name="Baffi a Manubrio"
-                        data-desc="Baffi lunghi con le estremità arricciate verso l'alto grazie alla cera. Stile retrò e dandy."
-                        data-prompt="man with handlebar mustache, long curled upward tips with wax, dandy retro gentleman, no beard">
-                    <span class="checkmark"></span><h3>a Manubrio</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="pencil"
-                        data-name="Baffi a Matita"
-                        data-desc="Una linea sottilissima di baffi appena sopra il labbro, molto curata e minimal."
-                        data-prompt="man with pencil thin mustache, very thin line above upper lip, minimal elegant style, no beard">
-                    <span class="checkmark"></span><h3>a Matita</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="ferro_di_cavallo"
-                        data-name="Baffi a Ferro di Cavallo"
-                        data-desc="Baffi folti che scendono verticalmente ai lati della bocca fino alla mascella."
-                        data-prompt="man with horseshoe mustache, thick mustache going vertically down both sides of mouth to jaw, no beard">
-                    <span class="checkmark"></span><h3>a Ferro di Cavallo</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="pizzetto_anchor"
-                        data-name="Pizzetto e Baffi disconnected"
-                        data-desc="Baffi e pizzetto ci sono, ma non si uniscono negli angoli della bocca."
-                        data-prompt="man with disconnected goatee and mustache, separated mustache and chin beard not connected">
-                    <span class="checkmark"></span><h3>disconnected</h3>
-                </label>
-                <label class="beard-item">
-                    <input type="radio" name="beard_style" value="pulito"
-                        data-name="Rasatura Completa"
-                        data-desc="Nessun pelo sul viso. Un look pulito e classico."
-                        data-prompt="man with completely clean shaved face, no beard no mustache, fresh clean shave">
-                    <span class="checkmark"></span><h3>Completamente Rasato</h3>
-                </label>
-            </div>
-
-            <div id="color-section">
-                <h2>Scegli il Colore</h2>
-                <div class="color-group">
-                    <label class="color-item"><input type="radio" name="beard_color" value="black">Nero</label>
-                    <label class="color-item"><input type="radio" name="beard_color" value="dark brown">Marrone</label>
-                    <label class="color-item selected"><input type="radio" name="beard_color" value="salt and pepper gray" checked>Bianco/Grigio</label>
-                    <label class="color-item"><input type="radio" name="beard_color" value="red auburn">Rosso</label>
-                </div>
-            </div>
-
-            <button type="button" id="generate-btn" onclick="generaImmagine()">✨ Genera con AI</button>
-        </form>
+    <!-- FOTO: originale | generata -->
+    <div class="photos-row">
+      <div class="photo-panel">
+        <div class="photo-label">📷 Foto Originale</div>
+        <div class="photo-inner">
+          <img src="images/original-face.jpg" alt="Foto originale" crossorigin="anonymous" />
+        </div>
+      </div>
+      <div class="photo-panel">
+        <div class="photo-label">✨ Immagine Generata</div>
+        <div class="photo-inner" id="result-wrap">
+          <div class="skeleton" id="skeleton"></div>
+          <img id="result-img" alt="Risultato generato" />
+          <div id="result-placeholder">
+            Seleziona le opzioni e clicca<br /><strong style="color:var(--gold)">Genera Immagine</strong>
+          </div>
+          <div class="loader-text" id="loader-text">Generazione in corso...</div>
+        </div>
+      </div>
     </div>
 
-    <!-- PAGINA RISULTATO -->
-    <div id="result-page">
-        <div class="photos-row">
-            <div class="photo-box">
-                <div class="photo-label">📷 Foto Originale</div>
-                <img src="image_0.JPG" alt="Manuel originale">
-            </div>
-            <div class="photo-box">
-                <div class="photo-label">✨ Immagine Generata</div>
-                <div class="img-skeleton" id="img-skeleton"></div>
-                <img src="" alt="Stile generato" id="result-photo" style="display:none;">
-                <div id="loader-text"></div>
-            </div>
-        </div>
+    <!-- OPZIONI -->
+    <div class="options-card">
 
-        <div id="error-msg">
-            ⚠️ Errore nella generazione. Clicca "Rigenera" per riprovare.
+      <!-- Stile Barba -->
+      <div class="opt-group">
+        <div class="opt-title">Stile Barba</div>
+        <div class="chips" id="chips-style">
+          <div class="chip on" data-group="style" data-val="full beard, thick and well-groomed" data-label="Barba Piena">
+            Barba Piena <small>Barba folta e ben curata</small>
+          </div>
+          <div class="chip" data-group="style" data-val="goatee beard, only chin and mustache, shaved cheeks" data-label="Pizzetto">
+            Pizzetto <small>Solo mento e baffi</small>
+          </div>
+          <div class="chip" data-group="style" data-val="short stubble beard 3-5 days" data-label="Barba Corta">
+            Barba Corta <small>Barba di 3-5 giorni</small>
+          </div>
+          <div class="chip" data-group="style" data-val="completely clean shaved face, no beard" data-label="Rasato">
+            Rasato <small>Viso completamente rasato</small>
+          </div>
+          <div class="chip" data-group="style" data-val="Van Dyke beard with pointed goatee and separated curled mustache" data-label="Van Dyke">
+            Van Dyke <small>Pizzetto con baffi separati</small>
+          </div>
+          <div class="chip" data-group="style" data-val="long sideburns going down to the chin" data-label="Basette Lunghe">
+            Basette Lunghe <small>Basette che scendono fino al mento</small>
+          </div>
         </div>
+      </div>
 
-        <div id="result-info">
-            <h1 id="result-style-title">—</h1>
-            <p id="result-style-desc"></p>
-            <div class="powered-badge">Generato da <span>Pollinations.ai</span> · Gratis · Nessuna API key</div>
+      <!-- Colore Barba -->
+      <div class="opt-group">
+        <div class="opt-title">Colore Barba</div>
+        <div class="chips" id="chips-color">
+          <div class="color-chip on" data-group="color" data-val="natural beard color" data-label="Naturale">
+            <div class="cdot" style="background:linear-gradient(135deg,#4a3520,#888)"></div>Naturale
+          </div>
+          <div class="color-chip" data-group="color" data-val="jet black beard" data-label="Nero">
+            <div class="cdot" style="background:#111"></div>Nero
+          </div>
+          <div class="color-chip" data-group="color" data-val="dark brown beard" data-label="Castano">
+            <div class="cdot" style="background:#5c3317"></div>Castano
+          </div>
+          <div class="color-chip" data-group="color" data-val="blonde beard" data-label="Biondo">
+            <div class="cdot" style="background:#d4a843"></div>Biondo
+          </div>
+          <div class="color-chip" data-group="color" data-val="red auburn beard" data-label="Rosso">
+            <div class="cdot" style="background:#8b2e10"></div>Rosso
+          </div>
+          <div class="color-chip" data-group="color" data-val="white beard" data-label="Bianco">
+            <div class="cdot" style="background:#ddd;border-color:#888"></div>Bianco
+          </div>
+          <div class="color-chip" data-group="color" data-val="salt and pepper gray beard" data-label="Grigio">
+            <div class="cdot" style="background:#777"></div>Grigio
+          </div>
         </div>
+      </div>
 
-        <div class="result-actions">
-            <button class="btn-secondary" onclick="rigeneraStessa()">🔄 Rigenera</button>
-            <button class="btn-primary" onclick="ricomincia()">← Scegli altro stile</button>
+      <!-- Sfondo -->
+      <div class="opt-group">
+        <div class="opt-title">Sfondo</div>
+        <div class="chips" id="chips-bg">
+          <div class="chip on" data-group="bg" data-val="professional photography studio background with soft grey backdrop" data-label="Studio Fotografico">
+            Studio Fotografico
+          </div>
+          <div class="chip" data-group="bg" data-val="modern office background with blurred desks and city windows" data-label="Ufficio Moderno">
+            Ufficio Moderno
+          </div>
+          <div class="chip" data-group="bg" data-val="outdoor nature background with blurred trees and daylight" data-label="All'Aperto">
+            All'Aperto
+          </div>
+          <div class="chip" data-group="bg" data-val="blurred city street urban background at golden hour" data-label="Città">
+            Città
+          </div>
+          <div class="chip" data-group="bg" data-val="beach background with blurred ocean and warm light" data-label="Spiaggia">
+            Spiaggia
+          </div>
         </div>
+      </div>
+
+      <!-- Abbigliamento -->
+      <div class="opt-group">
+        <div class="opt-title">Abbigliamento</div>
+        <div class="chips" id="chips-clothes">
+          <div class="chip" data-group="clothes" data-val="wearing a dark grey formal suit and tie, elegant attire" data-label="Abito Elegante">
+            Abito Elegante <small>Completo grigio scuro</small>
+          </div>
+          <div class="chip on" data-group="clothes" data-val="wearing a casual t-shirt and jeans" data-label="Casual">
+            Casual <small>Maglietta e jeans</small>
+          </div>
+          <div class="chip" data-group="clothes" data-val="wearing a business casual shirt and blazer jacket" data-label="Business Casual">
+            Business Casual <small>Camicia e giacca</small>
+          </div>
+          <div class="chip" data-group="clothes" data-val="wearing a plain simple t-shirt" data-label="T-Shirt">
+            T-Shirt <small>Maglietta semplice</small>
+          </div>
+          <div class="chip" data-group="clothes" data-val="wearing an elegant polo shirt" data-label="Polo">
+            Polo <small>Polo elegante</small>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <script>
-        // UI: selezione stili
-        document.querySelectorAll('.beard-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.beard-item').forEach(i => i.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
-        // UI: selezione colori
-        document.querySelectorAll('.color-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.color-item').forEach(i => i.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
+    <!-- RIEPILOGO SELEZIONE -->
+    <div class="summary" id="summary-box">
+      <b>Selezione Attuale</b><br />
+      Stile: <b id="s-style">Barba Piena</b> &nbsp;·&nbsp;
+      Colore: <b id="s-color">Naturale</b> &nbsp;·&nbsp;
+      Sfondo: <b id="s-bg">Studio Fotografico</b> &nbsp;·&nbsp;
+      Vestiti: <b id="s-clothes">Casual</b>
+    </div>
 
-        // Stato
-        let currentPrompt = '';
-        let currentSeed = 0;
-        let loaderInterval = null;
+    <button id="gen-btn" onclick="genera()">✨ Genera Immagine</button>
+    <div id="err-box">⚠️ Errore nella generazione. Clicca "Rigenera" per riprovare.</div>
 
-        function generaImmagine() {
-            const styleRadio = document.querySelector('input[name="beard_style"]:checked');
-            const colorRadio = document.querySelector('input[name="beard_color"]:checked');
+    <div class="regen-row" id="regen-row" style="display:none">
+      <button class="btn-sec" onclick="rigenera()">🔄 Rigenera</button>
+      <button class="btn-sec" onclick="location.reload()">← Ricomincia</button>
+    </div>
 
-            if (!styleRadio) {
-                alert('Per favore, scegli uno stile di barba!');
-                return;
-            }
+    <div class="powered">Immagine generata da <span>Pollinations.ai</span> · Gratis · Nessuna API key richiesta</div>
 
-            const color = colorRadio ? colorRadio.value : 'salt and pepper gray';
-            const beardPrompt = styleRadio.dataset.prompt;
+  </div><!-- /page -->
 
-            // Costruiamo il prompt: descrive Manuel (bald, Italian man) con lo stile scelto
-            currentPrompt = `Photorealistic portrait photo of a middle-aged Italian man, bald head, ${beardPrompt}, ${color} colored beard, wearing a casual dark t-shirt, neutral dark background, studio portrait lighting, sharp focus, high quality, 8k`;
-            currentSeed = Math.floor(Math.random() * 9999999);
+  <script>
+    // ── stato selezionato ───────────────────────────────────────────
+    const sel = {
+      style:   { val: 'full beard, thick and well-groomed',                           label: 'Barba Piena' },
+      color:   { val: 'natural beard color',                                           label: 'Naturale' },
+      bg:      { val: 'professional photography studio background with soft grey backdrop', label: 'Studio Fotografico' },
+      clothes: { val: 'wearing a casual t-shirt and jeans',                            label: 'Casual' }
+    };
+    let currentSeed = 0;
+    let loaderTimer = null;
 
-            document.getElementById('result-style-title').innerText = styleRadio.dataset.name;
-            document.getElementById('result-style-desc').innerText  = styleRadio.dataset.desc;
+    // ── chip click ─────────────────────────────────────────────────
+    document.querySelectorAll('[data-group]').forEach(chip => {
+      chip.addEventListener('click', function () {
+        const g = this.dataset.group;
+        // deselect same group
+        document.querySelectorAll(`[data-group="${g}"]`).forEach(c => c.classList.remove('on'));
+        this.classList.add('on');
+        sel[g] = { val: this.dataset.val, label: this.dataset.label };
+        updateSummary();
+      });
+    });
 
-            document.getElementById('selection-page').style.display = 'none';
-            document.getElementById('result-page').style.display    = 'block';
-            window.scrollTo(0, 0);
+    function updateSummary() {
+      document.getElementById('s-style').textContent   = sel.style.label;
+      document.getElementById('s-color').textContent   = sel.color.label;
+      document.getElementById('s-bg').textContent      = sel.bg.label;
+      document.getElementById('s-clothes').textContent = sel.clothes.label;
+    }
 
-            avviaGenerazione();
-        }
+    // ── build prompt ───────────────────────────────────────────────
+    function buildPrompt() {
+      // Descriviamo ESATTAMENTE cosa vogliamo mantenere e cosa cambiare,
+      // passando l'immagine originale come base (img2img via Pollinations).
+      return [
+        'photorealistic portrait photo of the same man from the reference image,',
+        'keep the face identical same person same features,',
+        sel.style.val + ',',
+        sel.color.val + ',',
+        sel.clothes.val + ',',
+        sel.bg.val + ',',
+        'high quality sharp focus professional portrait photography, 8k'
+      ].join(' ');
+    }
 
-        function avviaGenerazione() {
-            const skeleton   = document.getElementById('img-skeleton');
-            const resultImg  = document.getElementById('result-photo');
-            const loaderText = document.getElementById('loader-text');
-            const resultInfo = document.getElementById('result-info');
-            const errorMsg   = document.getElementById('error-msg');
+    // ── URL Pollinations img2img ───────────────────────────────────
+    // Passiamo la foto originale come "image" base — Pollinations usa FLUX img2img
+    // che mantiene la struttura del volto mentre applica le modifiche richieste.
+    function buildUrl(seed) {
+      const prompt     = encodeURIComponent(buildPrompt());
+      const sourceImg  = encodeURIComponent('https://v0-beard-style-generator.vercel.app/images/original-face.jpg');
+      return `https://image.pollinations.ai/prompt/${prompt}`
+           + `?image=${sourceImg}`
+           + `&model=flux`
+           + `&width=512&height=680`
+           + `&nologo=true`
+           + `&enhance=true`
+           + `&seed=${seed}`;
+    }
 
-            // Reset
-            skeleton.style.display   = 'block';
-            resultImg.style.display  = 'none';
-            loaderText.style.display = 'block';
-            loaderText.innerText     = 'Connessione all\'AI...';
-            resultInfo.style.display = 'none';
-            errorMsg.style.display   = 'none';
-            if (loaderInterval) clearInterval(loaderInterval);
+    // ── genera ─────────────────────────────────────────────────────
+    function genera() {
+      currentSeed = Math.floor(Math.random() * 9_999_999);
+      avvia();
+    }
+    function rigenera() {
+      currentSeed = Math.floor(Math.random() * 9_999_999);
+      avvia();
+    }
 
-            // Rotating messages
-            const msgs = ['Generazione in corso...', 'Disegnando la barba...', 'Aggiungendo dettagli...', 'Quasi pronto...'];
-            let mi = 0;
-            loaderInterval = setInterval(() => {
-                mi = (mi + 1) % msgs.length;
-                loaderText.innerText = msgs[mi];
-            }, 2500);
+    function avvia() {
+      const skeleton   = document.getElementById('skeleton');
+      const resultImg  = document.getElementById('result-img');
+      const placeholder = document.getElementById('result-placeholder');
+      const loaderTxt  = document.getElementById('loader-text');
+      const errBox     = document.getElementById('err-box');
+      const genBtn     = document.getElementById('gen-btn');
+      const regenRow   = document.getElementById('regen-row');
 
-            // Pollinations.ai — API gratuita, nessuna chiave richiesta
-            const encoded  = encodeURIComponent(currentPrompt);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=512&height=680&model=flux&nologo=true&enhance=true&seed=${currentSeed}`;
+      // reset UI
+      skeleton.style.display    = 'block';
+      resultImg.style.display   = 'none';
+      placeholder.style.display = 'none';
+      loaderTxt.style.display   = 'block';
+      loaderTxt.textContent     = 'Connessione all\'AI...';
+      errBox.style.display      = 'none';
+      genBtn.disabled           = true;
+      regenRow.style.display    = 'none';
+      if (loaderTimer) clearInterval(loaderTimer);
 
-            const img = new Image();
-            img.onload = () => {
-                clearInterval(loaderInterval);
-                resultImg.src           = imageUrl;
-                resultImg.style.display = 'block';
-                skeleton.style.display  = 'none';
-                loaderText.style.display= 'none';
-                resultInfo.style.display= 'block';
-            };
-            img.onerror = () => {
-                clearInterval(loaderInterval);
-                skeleton.style.display  = 'none';
-                loaderText.style.display= 'none';
-                errorMsg.style.display  = 'block';
-            };
-            img.src = imageUrl;
-        }
+      // rotating messages
+      const msgs = [
+        'Analisi del volto...',
+        'Applicazione barba...',
+        'Rendering sfondo...',
+        'Aggiunta vestiti...',
+        'Quasi pronto...'
+      ];
+      let mi = 0;
+      loaderTimer = setInterval(() => {
+        mi = (mi + 1) % msgs.length;
+        loaderTxt.textContent = msgs[mi];
+      }, 2400);
 
-        function rigeneraStessa() {
-            currentSeed = Math.floor(Math.random() * 9999999);
-            avviaGenerazione();
-        }
+      const url = buildUrl(currentSeed);
+      const img = new Image();
 
-        function ricomincia() {
-            document.getElementById('result-page').style.display    = 'none';
-            document.getElementById('selection-page').style.display = 'block';
-            window.scrollTo(0, 0);
-        }
-    </script>
+      img.onload = () => {
+        clearInterval(loaderTimer);
+        resultImg.src           = url;
+        resultImg.style.display = 'block';
+        skeleton.style.display  = 'none';
+        loaderTxt.style.display = 'none';
+        genBtn.disabled         = false;
+        regenRow.style.display  = 'flex';
+      };
+
+      img.onerror = () => {
+        clearInterval(loaderTimer);
+        skeleton.style.display  = 'none';
+        loaderTxt.style.display = 'none';
+        errBox.style.display    = 'block';
+        genBtn.disabled         = false;
+        regenRow.style.display  = 'flex';
+      };
+
+      img.src = url;
+    }
+  </script>
 </body>
 </html>
