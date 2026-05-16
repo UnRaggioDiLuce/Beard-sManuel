@@ -6,102 +6,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Beard Style Generator - AI</title>
   <style>
-    :root {
-      --bg: #0f0f0f; --card: #1a1a1a; --card2: #202020;
-      --border: #2d2d2d; --gold: #c9a84c; --gold2: #e8c97a;
-      --text: #efefef; --muted: #777; --r: 10px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
-
-```
-header {
-  background: var(--card); border-bottom: 1px solid var(--border);
-  padding: 16px 24px; text-align: center;
-  position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-}
-header h1 { font-size: 1.55rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; }
-header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
-
-.page { max-width: 1080px; margin: 0 auto; padding: 28px 18px 70px; }
-
-/* API KEY BANNER */
-#key-banner {
-  background: var(--card); border: 1px solid var(--gold);
-  border-radius: var(--r); padding: 18px 20px;
-  margin-bottom: 22px; display: flex; align-items: center; gap: 14px;
-  flex-wrap: wrap;
-}
-#key-banner label { font-size: 0.8rem; color: var(--gold); font-weight: 700; white-space: nowrap; }
-#key-banner input {
-  flex: 1; min-width: 200px;
-  background: var(--card2); border: 1px solid var(--border);
-  border-radius: 7px; padding: 9px 13px;
-  color: var(--text); font-size: 0.85rem; font-family: monospace;
-  outline: none;
-}
-#key-banner input:focus { border-color: var(--gold); }
-#save-key-btn {
-  padding: 9px 18px; background: var(--gold); color: #0f0f0f;
-  border: none; border-radius: 7px; font-weight: 700;
-  cursor: pointer; font-size: 0.82rem; white-space: nowrap;
-}
-#save-key-btn:hover { background: var(--gold2); }
-#key-ok { font-size: 0.75rem; color: #6d9; white-space: nowrap; display: none; }
-#key-link { font-size: 0.72rem; color: var(--muted); width: 100%; }
-#key-link a { color: var(--gold); }
-
-/* PHOTOS */
-.photos-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 28px; }
-@media(max-width:620px){ .photos-row { grid-template-columns: 1fr; } }
-
-.photo-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
-.photo-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); font-weight: 700; padding: 12px 14px 8px; border-bottom: 1px solid var(--border); }
-.photo-inner { position: relative; width: 100%; aspect-ratio: 3/4; background: var(--card2); overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.photo-inner img.main { width: 100%; height: 100%; object-fit: cover; display: block; }
-#result-img { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-#result-placeholder { text-align: center; color: var(--muted); font-size: 0.8rem; line-height: 1.7; padding: 20px; }
-
-.skeleton { position: absolute; inset: 0; background: linear-gradient(90deg,#1a1a1a 25%,#282828 50%,#1a1a1a 75%); background-size: 200% 100%; animation: shi 1.4s infinite; display: none; }
-@keyframes shi { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-.loader-text { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-size: 0.74rem; color: var(--gold); display: none; }
-
-/* OPTIONS */
-.options-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 20px 24px; margin-bottom: 18px; }
-.opt-group { margin-bottom: 20px; }
-.opt-group:last-child { margin-bottom: 0; }
-.opt-title { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { background: var(--card2); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 0.82rem; color: var(--text); transition: all 0.15s; user-select: none; }
-.chip:hover { border-color: var(--gold); color: var(--gold); }
-.chip.on { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold2); font-weight: 600; }
-.chip small { display: block; font-size: 0.68rem; color: var(--muted); margin-top: 2px; font-weight: 400; }
-.chip.on small { color: rgba(201,168,76,0.65); }
-
-.color-chip { display: flex; align-items: center; gap: 8px; background: var(--card2); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 13px; cursor: pointer; font-size: 0.82rem; color: var(--text); transition: all 0.15s; }
-.color-chip:hover { border-color: var(--gold); }
-.color-chip.on { border-color: var(--gold); background: rgba(201,168,76,0.1); color: var(--gold2); font-weight: 600; }
-.cdot { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
-
-.summary { background: var(--card2); border: 1px solid var(--border); border-radius: var(--r); padding: 13px 18px; font-size: 0.8rem; color: var(--muted); line-height: 1.9; margin-bottom: 16px; }
-.summary b { color: var(--gold2); font-weight: 600; }
-
-#gen-btn { display: block; width: 100%; padding: 16px; background: var(--gold); color: #0f0f0f; border: none; border-radius: var(--r); font-size: 1.05rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: background 0.2s; }
-#gen-btn:hover { background: var(--gold2); }
-#gen-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-.regen-row { display: flex; gap: 10px; margin-top: 14px; }
-.btn-sec { flex: 1; padding: 13px; background: var(--card2); border: 1px solid var(--border); border-radius: var(--r); color: var(--text); font-size: 0.9rem; cursor: pointer; transition: background 0.15s; }
-.btn-sec:hover { background: #2a2a2a; }
-
-.powered { text-align: center; margin-top: 28px; font-size: 0.7rem; color: #444; }
-.powered span { color: var(--gold); }
-
-#err-box { display: none; margin-top: 12px; background: #2a1515; border: 1px solid #6a3030; color: #e07070; border-radius: var(--r); padding: 12px 16px; font-size: 0.82rem; line-height: 1.5; }
-```
-
+    :root { --bg:#0f0f0f; --card:#1a1a1a; --card2:#202020; --border:#2d2d2d; --gold:#c9a84c; --gold2:#e8c97a; --text:#efefef; --muted:#777; --r:10px; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+    header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+    header h1{font-size:1.55rem;color:var(--gold);text-transform:uppercase;letter-spacing:2px;}
+    header p{font-size:.78rem;color:var(--muted);margin-top:4px;}
+    .page{max-width:1080px;margin:0 auto;padding:28px 18px 70px;}
+    .photos-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px;}
+    @media(max-width:620px){.photos-row{grid-template-columns:1fr;}}
+    .photo-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+    .photo-label{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700;padding:12px 14px 8px;border-bottom:1px solid var(--border);}
+    .photo-inner{position:relative;width:100%;aspect-ratio:3/4;background:var(--card2);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+    .photo-inner img.main{width:100%;height:100%;object-fit:cover;display:block;}
+    #result-img{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    #result-placeholder{text-align:center;color:var(--muted);font-size:.8rem;line-height:1.7;padding:20px;}
+    .skeleton{position:absolute;inset:0;background:linear-gradient(90deg,#1a1a1a 25%,#282828 50%,#1a1a1a 75%);background-size:200% 100%;animation:shi 1.4s infinite;display:none;}
+    @keyframes shi{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .loader-text{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:.74rem;color:var(--gold);display:none;}
+    .options-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px 20px 24px;margin-bottom:18px;}
+    .opt-group{margin-bottom:20px;}.opt-group:last-child{margin-bottom:0;}
+    .opt-title{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px;}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .chip{background:var(--card2);border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:.82rem;color:var(--text);transition:all .15s;user-select:none;}
+    .chip:hover{border-color:var(--gold);color:var(--gold);}
+    .chip.on{background:rgba(201,168,76,.1);border-color:var(--gold);color:var(--gold2);font-weight:600;}
+    .chip small{display:block;font-size:.68rem;color:var(--muted);margin-top:2px;font-weight:400;}
+    .chip.on small{color:rgba(201,168,76,.65);}
+    .color-chip{display:flex;align-items:center;gap:8px;background:var(--card2);border:1.5px solid var(--border);border-radius:8px;padding:7px 13px;cursor:pointer;font-size:.82rem;color:var(--text);transition:all .15s;}
+    .color-chip:hover{border-color:var(--gold);}
+    .color-chip.on{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold2);font-weight:600;}
+    .cdot{width:13px;height:13px;border-radius:50%;border:1px solid rgba(255,255,255,.15);flex-shrink:0;}
+    .summary{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:13px 18px;font-size:.8rem;color:var(--muted);line-height:1.9;margin-bottom:16px;}
+    .summary b{color:var(--gold2);font-weight:600;}
+    #gen-btn{display:block;width:100%;padding:16px;background:var(--gold);color:#0f0f0f;border:none;border-radius:var(--r);font-size:1.05rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:background .2s;}
+    #gen-btn:hover{background:var(--gold2);}
+    #gen-btn:disabled{opacity:.45;cursor:not-allowed;}
+    .regen-row{display:flex;gap:10px;margin-top:14px;}
+    .btn-sec{flex:1;padding:13px;background:var(--card2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.9rem;cursor:pointer;}
+    .btn-sec:hover{background:#2a2a2a;}
+    .powered{text-align:center;margin-top:28px;font-size:.7rem;color:#444;}
+    .powered span{color:var(--gold);}
+    #err-box{display:none;margin-top:12px;background:#2a1515;border:1px solid #6a3030;color:#e07070;border-radius:var(--r);padding:12px 16px;font-size:.82rem;line-height:1.5;}
   </style>
 </head>
 <body>
@@ -109,54 +55,38 @@ header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
     <h1>Beard Style Generator</h1>
     <p>Scegli lo stile di barba, colore, sfondo e vestiti per generare una nuova immagine</p>
   </header>
-
   <div class="page">
+    <div class="photos-row">
+      <div class="photo-panel">
+        <div class="photo-label">📷 Foto Originale</div>
+        <div class="photo-inner">
+          <img class="main" src="image_0.JPG" alt="Foto originale" id="original-photo" crossorigin="anonymous" />
+        </div>
+      </div>
+      <div class="photo-panel">
+        <div class="photo-label">✨ Immagine Generata</div>
+        <div class="photo-inner">
+          <div class="skeleton" id="skeleton"></div>
+          <img id="result-img" alt="Risultato" />
+          <div id="result-placeholder">Seleziona le opzioni e clicca<br /><strong style="color:var(--gold)">Genera Immagine</strong></div>
+          <div class="loader-text" id="loader-text"></div>
+        </div>
+      </div>
+    </div>
 
 ```
-<!-- API KEY -->
-<div id="key-banner">
-  <label>🔑 Google AI Studio API Key</label>
-  <input type="password" id="api-key-input" placeholder="Incolla qui la tua API key gratuita..." />
-  <button id="save-key-btn" onclick="saveKey()">Salva</button>
-  <span id="key-ok">✓ Key salvata</span>
-  <div id="key-link">
-    Ottieni la tua API key gratuita su <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> — è gratis, nessuna carta di credito.
-  </div>
-</div>
-
-<!-- FOTO -->
-<div class="photos-row">
-  <div class="photo-panel">
-    <div class="photo-label">📷 Foto Originale</div>
-    <div class="photo-inner">
-      <img class="main" src="image_0.JPG" alt="Foto originale" id="original-photo" crossorigin="anonymous" />
-    </div>
-  </div>
-  <div class="photo-panel">
-    <div class="photo-label">✨ Immagine Generata</div>
-    <div class="photo-inner" id="result-wrap">
-      <div class="skeleton" id="skeleton"></div>
-      <img id="result-img" alt="Risultato generato" />
-      <div id="result-placeholder">Seleziona le opzioni e clicca<br /><strong style="color:var(--gold)">Genera Immagine</strong></div>
-      <div class="loader-text" id="loader-text"></div>
-    </div>
-  </div>
-</div>
-
-<!-- OPZIONI -->
 <div class="options-card">
   <div class="opt-group">
     <div class="opt-title">Stile Barba</div>
     <div class="chips">
-      <div class="chip on" data-group="style" data-val="full beard, thick and well-groomed" data-label="Barba Piena">Barba Piena <small>Barba folta e ben curata</small></div>
-      <div class="chip" data-group="style" data-val="goatee beard, only chin and mustache, clean shaved cheeks" data-label="Pizzetto">Pizzetto <small>Solo mento e baffi</small></div>
+      <div class="chip on" data-group="style" data-val="full beard thick and well-groomed" data-label="Barba Piena">Barba Piena <small>Barba folta e ben curata</small></div>
+      <div class="chip" data-group="style" data-val="goatee beard only chin and mustache clean shaved cheeks" data-label="Pizzetto">Pizzetto <small>Solo mento e baffi</small></div>
       <div class="chip" data-group="style" data-val="very short 3-day stubble beard" data-label="Barba Corta">Barba Corta <small>Barba di 3-5 giorni</small></div>
-      <div class="chip" data-group="style" data-val="completely clean-shaved face, no beard at all" data-label="Rasato">Rasato <small>Viso completamente rasato</small></div>
-      <div class="chip" data-group="style" data-val="Van Dyke beard with pointed goatee and disconnected curled mustache" data-label="Van Dyke">Van Dyke <small>Pizzetto con baffi separati</small></div>
-      <div class="chip" data-group="style" data-val="long thick sideburns extending down to the chin" data-label="Basette Lunghe">Basette Lunghe <small>Basette che scendono fino al mento</small></div>
+      <div class="chip" data-group="style" data-val="completely clean shaved face no beard" data-label="Rasato">Rasato <small>Completamente rasato</small></div>
+      <div class="chip" data-group="style" data-val="Van Dyke beard pointed goatee disconnected curled mustache" data-label="Van Dyke">Van Dyke <small>Pizzetto con baffi separati</small></div>
+      <div class="chip" data-group="style" data-val="long thick sideburns extending to the chin" data-label="Basette Lunghe">Basette Lunghe <small>Basette fino al mento</small></div>
     </div>
   </div>
-
   <div class="opt-group">
     <div class="opt-title">Colore Barba</div>
     <div class="chips">
@@ -169,18 +99,16 @@ header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
       <div class="color-chip" data-group="color" data-val="salt and pepper gray" data-label="Grigio"><div class="cdot" style="background:#777"></div>Grigio</div>
     </div>
   </div>
-
   <div class="opt-group">
     <div class="opt-title">Sfondo</div>
     <div class="chips">
-      <div class="chip on" data-group="bg" data-val="professional photography studio with soft grey backdrop" data-label="Studio Fotografico">Studio Fotografico</div>
-      <div class="chip" data-group="bg" data-val="modern office with blurred desks and city windows" data-label="Ufficio Moderno">Ufficio Moderno</div>
-      <div class="chip" data-group="bg" data-val="outdoor nature with blurred trees and soft daylight" data-label="All'Aperto">All'Aperto</div>
-      <div class="chip" data-group="bg" data-val="blurred city street at golden hour" data-label="Città">Città</div>
-      <div class="chip" data-group="bg" data-val="beach with blurred ocean and warm light" data-label="Spiaggia">Spiaggia</div>
+      <div class="chip on" data-group="bg" data-val="professional photography studio soft grey backdrop" data-label="Studio Fotografico">Studio Fotografico</div>
+      <div class="chip" data-group="bg" data-val="modern office blurred desks and city windows" data-label="Ufficio Moderno">Ufficio Moderno</div>
+      <div class="chip" data-group="bg" data-val="outdoor nature blurred trees soft daylight" data-label="All'Aperto">All'Aperto</div>
+      <div class="chip" data-group="bg" data-val="blurred city street golden hour" data-label="Città">Città</div>
+      <div class="chip" data-group="bg" data-val="beach blurred ocean warm light" data-label="Spiaggia">Spiaggia</div>
     </div>
   </div>
-
   <div class="opt-group">
     <div class="opt-title">Abbigliamento</div>
     <div class="chips">
@@ -200,186 +128,90 @@ header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
 
 <button id="gen-btn" onclick="genera()">✨ Genera Immagine</button>
 <div id="err-box"></div>
-
 <div class="regen-row" id="regen-row" style="display:none">
   <button class="btn-sec" onclick="genera()">🔄 Rigenera</button>
   <button class="btn-sec" onclick="resetUI()">← Nuova selezione</button>
 </div>
-
-<div class="powered">Motore: <span>Gemini 2.5 Flash Image</span> · Face-preserving AI editing</div>
+<div class="powered">Motore: <span>Gemini via Puter.js</span> · Volto preservato · Face-preserving AI</div>
 ```
 
   </div>
 
   <script>
-    // ── API KEY ────────────────────────────────────────────────────
-    const keyInput = document.getElementById('api-key-input');
-    const savedKey = localStorage.getItem('gemini_api_key') || '';
-    if (savedKey) {
-      keyInput.value = savedKey;
-      document.getElementById('key-ok').style.display = 'inline';
-    }
-    function saveKey() {
-      const k = keyInput.value.trim();
-      if (!k) return alert('Incolla prima la tua API key.');
-      localStorage.setItem('gemini_api_key', k);
-      document.getElementById('key-ok').style.display = 'inline';
-    }
-
-    // ── SELEZIONE ─────────────────────────────────────────────────
     const sel = {
-      style:   { val: 'full beard, thick and well-groomed', label: 'Barba Piena' },
-      color:   { val: 'natural color',                       label: 'Naturale' },
-      bg:      { val: 'professional photography studio with soft grey backdrop', label: 'Studio Fotografico' },
-      clothes: { val: 'casual t-shirt and jeans',            label: 'Casual' }
+      style:   { val:'full beard thick and well-groomed', label:'Barba Piena' },
+      color:   { val:'natural color',                     label:'Naturale' },
+      bg:      { val:'professional photography studio soft grey backdrop', label:'Studio Fotografico' },
+      clothes: { val:'casual t-shirt and jeans',          label:'Casual' }
     };
 
-    document.querySelectorAll('[data-group]').forEach(chip => {
-      chip.addEventListener('click', function () {
-        const g = this.dataset.group;
-        document.querySelectorAll(`[data-group="${g}"]`).forEach(c => c.classList.remove('on'));
+    document.querySelectorAll('[data-group]').forEach(c => {
+      c.addEventListener('click', function(){
+        document.querySelectorAll(`[data-group="${this.dataset.group}"]`).forEach(x=>x.classList.remove('on'));
         this.classList.add('on');
-        sel[g] = { val: this.dataset.val, label: this.dataset.label };
+        sel[this.dataset.group] = { val:this.dataset.val, label:this.dataset.label };
         updateSummary();
       });
     });
 
-    function updateSummary() {
+    function updateSummary(){
       document.getElementById('s-style').textContent   = sel.style.label;
       document.getElementById('s-color').textContent   = sel.color.label;
       document.getElementById('s-bg').textContent      = sel.bg.label;
       document.getElementById('s-clothes').textContent = sel.clothes.label;
     }
 
-    // ── IMG → BASE64 ───────────────────────────────────────────────
-    async function imgToBase64(imgEl) {
-      const canvas = document.createElement('canvas');
-      canvas.width  = imgEl.naturalWidth  || imgEl.width;
-      canvas.height = imgEl.naturalHeight || imgEl.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(imgEl, 0, 0);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-      return dataUrl.split(',')[1]; // solo base64, senza prefisso
+    async function getBase64(){
+      try {
+        const img = document.getElementById('original-photo');
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth||img.width; c.height = img.naturalHeight||img.height;
+        c.getContext('2d').drawImage(img,0,0);
+        return c.toDataURL('image/jpeg',.92).split(',')[1];
+      } catch {
+        const blob = await (await fetch('image_0.JPG')).blob();
+        return new Promise(r=>{ const fr=new FileReader(); fr.onloadend=()=>r(fr.result.split(',')[1]); fr.readAsDataURL(blob); });
+      }
     }
 
-    // ── GENERA ─────────────────────────────────────────────────────
-    async function genera() {
-      const apiKey = (localStorage.getItem('gemini_api_key') || keyInput.value).trim();
-      if (!apiKey) {
-        alert('Prima inserisci e salva la tua Google AI Studio API key (è gratis).');
-        return;
-      }
+    async function genera(){
+      const sk=document.getElementById('skeleton'), ri=document.getElementById('result-img'),
+            ph=document.getElementById('result-placeholder'), lt=document.getElementById('loader-text'),
+            eb=document.getElementById('err-box'), gb=document.getElementById('gen-btn'),
+            rr=document.getElementById('regen-row');
 
-      const skeleton    = document.getElementById('skeleton');
-      const resultImg   = document.getElementById('result-img');
-      const placeholder = document.getElementById('result-placeholder');
-      const loaderTxt   = document.getElementById('loader-text');
-      const errBox      = document.getElementById('err-box');
-      const genBtn      = document.getElementById('gen-btn');
-      const regenRow    = document.getElementById('regen-row');
+      sk.style.display='block'; ri.style.display='none'; ph.style.display='none';
+      lt.style.display='block'; lt.textContent='Preparazione...';
+      eb.style.display='none'; gb.disabled=true; rr.style.display='none';
 
-      skeleton.style.display    = 'block';
-      resultImg.style.display   = 'none';
-      placeholder.style.display = 'none';
-      loaderTxt.style.display   = 'block';
-      loaderTxt.textContent     = 'Preparazione immagine...';
-      errBox.style.display      = 'none';
-      genBtn.disabled           = true;
-      regenRow.style.display    = 'none';
-
-      const msgs = ['Analisi volto...','Modifica barba...','Rendering sfondo...','Cambio vestiti...','Quasi pronto...'];
-      let mi = 0;
-      const timer = setInterval(() => { loaderTxt.textContent = msgs[++mi % msgs.length]; }, 2200);
+      const msgs=['Analisi volto...','Modifica barba...','Rendering sfondo...','Cambio vestiti...','Quasi pronto...'];
+      let mi=0, timer=setInterval(()=>{ lt.textContent=msgs[++mi%msgs.length]; }, 2200);
 
       try {
-        // 1. Converti foto originale in base64
-        const origEl = document.getElementById('original-photo');
-        let base64Img;
-        try {
-          base64Img = await imgToBase64(origEl);
-        } catch (e) {
-          // Se canvas è bloccato da CORS, carica via fetch
-          const res  = await fetch('image_0.JPG');
-          const blob = await res.blob();
-          base64Img  = await new Promise(resolve => {
-            const r = new FileReader();
-            r.onloadend = () => resolve(r.result.split(',')[1]);
-            r.readAsDataURL(blob);
-          });
-        }
+        const imageBase64 = await getBase64();
+        const prompt = `Edit this photo of a man. Keep his EXACT face, identity, skin tone, eyes, nose perfectly identical. Only change: beard to ${sel.style.val}, beard color to ${sel.color.val}, background to ${sel.bg.val}, clothing to ${sel.clothes.val}. Do NOT alter the face.`;
 
-        // 2. Prompt di editing
-        const prompt = `Edit this photo of a man. Keep his EXACT face, identity, skin tone, and facial features perfectly identical. ONLY change these things:
-- Beard style: change to ${sel.style.val}
-- Beard color: ${sel.color.val}
-- Background: replace with ${sel.bg.val}
-- Clothing: change to ${sel.clothes.val}
-Do not change the face, eyes, nose, ears, or head shape in any way. The person must look exactly the same, only the beard, background and clothing should be different.`;
-
-        // 3. Chiama Gemini 2.5 Flash Image
-        const body = {
-          contents: [{
-            parts: [
-              { inline_data: { mime_type: 'image/jpeg', data: base64Img } },
-              { text: prompt }
-            ]
-          }],
-          generationConfig: {
-            responseModalities: ['IMAGE', 'TEXT']
-          }
-        };
-
-        const apiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-          }
-        );
-
-        if (!apiRes.ok) {
-          const errData = await apiRes.json().catch(() => ({}));
-          throw new Error(errData?.error?.message || `HTTP ${apiRes.status}`);
-        }
-
-        const data = await apiRes.json();
-
-        // 4. Estrai immagine dalla risposta
-        let imageData = null;
-        for (const part of (data?.candidates?.[0]?.content?.parts || [])) {
-          if (part.inlineData?.mimeType?.startsWith('image/')) {
-            imageData = part.inlineData.data;
-            break;
-          }
-        }
-
-        if (!imageData) throw new Error('Nessuna immagine nella risposta. Riprova.');
+        const res  = await fetch('/api/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({imageBase64, prompt}) });
+        const data = await res.json();
+        if (!res.ok||data.error) throw new Error(data.error||'Errore server');
 
         clearInterval(timer);
-        resultImg.src           = `data:image/png;base64,${imageData}`;
-        resultImg.style.display = 'block';
-        skeleton.style.display  = 'none';
-        loaderTxt.style.display = 'none';
-        genBtn.disabled         = false;
-        regenRow.style.display  = 'flex';
+        ri.src='data:image/png;base64,'+data.image; ri.style.display='block';
+        sk.style.display='none'; lt.style.display='none'; gb.disabled=false; rr.style.display='flex';
 
-      } catch (err) {
+      } catch(err){
         clearInterval(timer);
-        skeleton.style.display  = 'none';
-        loaderTxt.style.display = 'none';
-        errBox.style.display    = 'block';
-        errBox.innerHTML        = `⚠️ <b>Errore:</b> ${err.message}`;
-        genBtn.disabled         = false;
-        regenRow.style.display  = 'flex';
+        sk.style.display='none'; lt.style.display='none';
+        eb.style.display='block'; eb.innerHTML='⚠️ <b>Errore:</b> '+err.message;
+        gb.disabled=false; rr.style.display='flex';
       }
     }
 
-    function resetUI() {
-      document.getElementById('result-img').style.display        = 'none';
-      document.getElementById('result-placeholder').style.display = 'block';
-      document.getElementById('regen-row').style.display          = 'none';
-      document.getElementById('err-box').style.display            = 'none';
+    function resetUI(){
+      document.getElementById('result-img').style.display='none';
+      document.getElementById('result-placeholder').style.display='block';
+      document.getElementById('regen-row').style.display='none';
+      document.getElementById('err-box').style.display='none';
     }
   </script>
 
